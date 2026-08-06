@@ -5,10 +5,6 @@ require_relative 'sacct_cli'
 
 # To get the special metrics from cli
 class SacctMetrics
-  def initialize
-    @db = SacctCli.db
-  end
-
   def build_rows(grouped_hash)
     grouped_hash.filter_map do |group_name, jobs|
       m = calculate_metrics(jobs)
