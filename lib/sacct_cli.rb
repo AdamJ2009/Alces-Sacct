@@ -16,13 +16,16 @@ class SacctCli
     @metrics = SacctMetrics.new
   end
 
-  def fetch_and_store
-    cmd = 'sacct -a -S now-7days --json > jobs_last_7days.json'
-    `#{cmd}`
+  def fetch_and_store(sacct_args = [])
+    extra_flags = Array(sacct_args).join(' ')
+    
+    cmd = "sacct #{extra_flags} > jobs.json"
+    puts "Executing: #{cmd}"
+    # `#{cmd}`
   end
 
   def parse
-    file = File.read('jobs_last_7days.json')
+    file = File.read('jobs.json')
     data = JSON.parse(file)
     @parse.parse(data)
   end

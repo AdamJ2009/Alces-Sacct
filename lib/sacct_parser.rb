@@ -13,7 +13,7 @@ class SacctParser
     data['jobs']&.each do |job|
       formatted = get_formatted(job)
       payload = get_payload(job, formatted)
-      load_to_database(payload)
+      payload
     end
   end
 
