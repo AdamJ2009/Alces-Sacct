@@ -21,7 +21,7 @@ class SacctCli
     
     cmd = "sacct #{extra_flags} > jobs.json"
     puts "Executing: #{cmd}"
-    # `#{cmd}`
+    `#{cmd}`
   end
 
   def parse

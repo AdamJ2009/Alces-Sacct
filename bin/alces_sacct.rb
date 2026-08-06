@@ -32,9 +32,9 @@ module Commands
     def call(sacct_args: [],**opts)
       cli = SacctCli.new
       cli.fetch_and_store(sacct_args)
-      cli.parse
+      results = cli.parse
       #options = clean_inputs(**opts)
-      results = fetch_data(cli, options)
+      #results = fetch_data(cli, options)
       if results.any?
         put_results(cli, results, **opts)
       else
