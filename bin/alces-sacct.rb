@@ -31,57 +31,53 @@ module Commands
     option :state,     aliases: ['-S'], type: :string, desc: 'Comma-separated states'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
 
-    def call(start: nil, end: nil, user: false, partition: '%', state: 'all', csv: nil, verbose: false, **)
-      target_user = parse_user_flag(user)
-
+    def call(**opts)
       cli = SacctCli.new
-      cli.fetch_and_store # Turn on on offical server
+      cli.fetch_and_store
       cli.parse
-      db = SacctCli.db
-
-      # Unix time conversion algorithm
-      end_date   = binding.local_variable_get(:end)
-      start_safe = start ? parse_date!('start', start) : EPOCH_START
-      end_safe   = end_date ? parse_date!('end', end_date) : Y2K38_LIMIT
-
-      start_time = [start_safe.to_time.to_i, 0].max # Prevents negative epoch timestamps
-      end_time   = end_safe.to_time.to_i
-
-      # Execute raw parameterized query with Sequel
-      if state == 'all'
-        query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ?'
-        results = db.fetch(query, start_time, end_time, target_user, partition)
-      else
-        state_list = cli.format_state(state)
-        query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ? AND state IN ?'
-        results = db.fetch(query, start_time, end_time, target_user, partition, state_list)
-      end
-
+      results = fetch_data(cli, **opts)
       if results.any?
-        puts '=== INDIVIDUAL JOBS TABLE ==='
-        headers, rows = cli.tty_table(results, verbose)
-        cli.metrics(results)
-
-        if csv && !csv.strip.empty?
-          csv_filename = csv_check!(csv)
-
-          CSV.open(csv_filename, 'w') do |csv_out|
-            # Write header row
-            csv_out << headers
-
-            # Stream each row to disk individually
-            rows.each do |row|
-              csv_out << row
-            end
-          end
-          puts "Successfully exported report to #{csv_filename}"
-        end
+        put_results(cli, results, **opts)
       else
         puts 'No records found matching criteria.'
       end
     end
 
     private
+
+    def fetch_data(cli, **opts)
+      db = SacctCli.db
+      start_time, end_time = get_time(opts[:start], opts[:end])
+      if state == 'all'
+        query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ?'
+        db.fetch(query, start_time, end_time, opts[:user], opts[:partition])
+      else
+        state_list = cli.format_state(opts[:state])
+        query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ? AND state IN ?'
+        db.fetch(query, start_time, end_time, opts[:user], opts[:partition], state_list)
+      end
+    end
+
+    def put_results(cli, results, **opts)
+      puts '=== INDIVIDUAL JOBS TABLE ==='
+      headers, rows = cli.tty_table(results, opts[:verbose])
+      cli.metrics(results)
+      csv = opts[:csv]
+      return unless csv && !csv.strip.empty?
+
+      write_csv(headers, rows, csv)
+    end
+
+    def write_csv(headers, rows, csv)
+      csv_filename = csv_check!(csv)
+      CSV.open(csv_filename, 'w') do |csv_out|
+        csv_out << headers
+        rows.each do |row|
+          csv_out << row
+        end
+      end
+      puts "Successfully exported report to #{csv_filename}"
+    end
 
     def parse_date!(name, value)
       unless value =~ /^\d{4}-\d{2}-\d{2}$/
