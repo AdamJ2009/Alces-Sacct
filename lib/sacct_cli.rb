@@ -90,7 +90,7 @@ class SacctCli
     ]
   end
 
-  def verbose_metrics_fields(_val)
+  def verbose_metrics_fields(val)
     [
       val[:alloccpus], "#{val[:totalcpus]}s", "#{val[:cpueff]}%",
       "#{val[:reqmem]}MB", "#{val[:maxrss] / 1024.0}MB", "#{val[:memeff]}%", val[:exitcode]
@@ -109,7 +109,7 @@ class SacctCli
     first_row = results.first
     headers = first_row.keys
     headers[10] = 'cputime'
-    if verbose
+    unless verbose
       headers = [headers[0], headers[1], headers[2], headers[3], headers[8], headers[10], headers[11], headers[14],
                  headers[15]]
     end

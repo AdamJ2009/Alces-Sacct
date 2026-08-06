@@ -33,7 +33,7 @@ module Commands
 
     def call(**opts)
       cli = SacctCli.new
-      cli.fetch_and_store
+      #cli.fetch_and_store
       cli.parse
       options = clean_inputs(**opts)
       results = fetch_data(cli, options)
