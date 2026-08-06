@@ -33,9 +33,10 @@ module Commands
 
     def call(**opts)
       cli = SacctCli.new
-      cli.fetch_and_store
+      # cli.fetch_and_store
       cli.parse
-      results = fetch_data(cli, **opts)
+      options = clean_inputs(**opts)
+      results = fetch_data(cli, options)
       if results.any?
         put_results(cli, results, **opts)
       else
@@ -45,17 +46,33 @@ module Commands
 
     private
 
-    def fetch_data(cli, **opts)
-      db = SacctCli.db
+    def clean_inputs(**opts)
       start_time, end_time = get_time(opts[:start], opts[:end])
-      if state == 'all'
+      partition = '%' if opts[:partition].nil? || opts[:partition].empty?
+      state = 'all' if opts[:state].nil? || opts[:state].empty?
+      target_user = parse_user_flag(opts[:user])
+      [start_time, end_time, target_user, partition, state]
+    end
+
+    def fetch_data(cli, values)
+      db = SacctCli.db
+      if values[4] == 'all'
         query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ?'
-        db.fetch(query, start_time, end_time, opts[:user], opts[:partition])
+        db.fetch(query, values[0], values[1], values[2], values[3])
       else
-        state_list = cli.format_state(opts[:state])
+        cli.format_state(state)
         query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ? AND state IN ?'
-        db.fetch(query, start_time, end_time, opts[:user], opts[:partition], state_list)
+        db.fetch(query, values)
       end
+    end
+
+    def get_time(start, end_date)
+      start_safe = start ? parse_date!('start', start) : EPOCH_START
+      end_safe   = end_date ? parse_date!('end', end_date) : Y2K38_LIMIT
+
+      start_time = [start_safe.to_time.to_i, 0].max # Prevents negative epoch timestamps
+      end_time   = end_safe.to_time.to_i
+      [start_time, end_time]
     end
 
     def put_results(cli, results, **opts)
