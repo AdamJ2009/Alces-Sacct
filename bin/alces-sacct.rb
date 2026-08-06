@@ -48,8 +48,8 @@ module Commands
 
     def clean_inputs(**opts)
       start_time, end_time = get_time(opts[:start], opts[:end])
-      partition = '%' if opts[:partition].nil? || opts[:partition].empty?
-      state = 'all' if opts[:state].nil? || opts[:state].empty?
+      partition = (opts[:partition] && !opts[:partition].empty?) ? opts[:partition] : '%'
+      state = (opts[:state] && !opts[:state].empty?) ? opts[:state] : 'all'
       target_user = parse_user_flag(opts[:user])
       [start_time, end_time, target_user, partition, state]
     end
@@ -60,9 +60,9 @@ module Commands
         query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ?'
         db.fetch(query, values[0], values[1], values[2], values[3])
       else
-        cli.format_state(state)
+        state_list = cli.format_state(values[4])
         query = 'SELECT * FROM sacct WHERE start >= ? AND end <= ? AND user LIKE ? AND partition LIKE ? AND state IN ?'
-        db.fetch(query, values)
+        db.fetch(query, values[0], values[1], values[2], values[3],state_list)
       end
     end
 
