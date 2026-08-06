@@ -1,0 +1,2 @@
+job_id,user,partition,state,submit,start,end,elapsed,queuetime,alloccpus,totalcpus,cpueff,reqmem,maxrss,memeff,exitcode
+104276,alces-cluster,nodes,COMPLETED,1785412012,1785412013,1785412313,300,1,1,0,0.001766,8022,1859584,22.63774619795562,0

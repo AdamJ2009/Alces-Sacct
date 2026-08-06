@@ -1,0 +1,3 @@
+default:
+  db_path: ./db/sacctCLI.sqlite3
+  welcome_message: "Welcome to sacctCLI"
