@@ -1,0 +1,64 @@
+# frozen_string_literal: true
+
+require 'spec_helper'
+require 'stringio'
+require 'date'
+require 'sequel'
+
+# Require the application file AFTER spec_helper
+require_relative '../bin/alces_sacct'
+
+RSpec.describe Commands::Report do
+  subject(:command) { described_class.new }
+
+  before do
+    # 1. Allow fetch_and_store to be called without doing real network/system work
+    allow_any_instance_of(SacctCli).to receive(:fetch_and_store)
+
+    # 2. Intercept File.read specifically when SacctCli tries to open 'jobs_last_7days.json'
+    #    and force it to read 'testing.json' instead.
+    allow(File).to receive(:read).and_call_original # Keep standard File.read working
+    allow(File).to receive(:read).with('jobs_last_7days.json').and_return(
+      File.read(File.expand_path('fixtures/testing.json', __dir__))
+    )
+
+    # 3. USE AN IN-MEMORY DATABASE FOR TESTS
+    test_db = Sequel.sqlite # Creates a brand new in-memory SQLite DB in RAM
+    
+    # Run schema setup on test_db
+    test_db.create_table?(:sacct) do
+      Integer :job_id, primary_key: true, null: false
+      String :user
+      String :partition
+      String :state
+      Integer :submit
+      Integer :start
+      Integer :end
+      Integer :elapsed
+      Float :queuetime
+      Integer :alloccpus
+      Float :totalcpus
+      Float :cpueff
+      Float :reqmem
+      Float :maxrss
+      Float :memeff
+      Integer :exitcode
+    end
+
+    # Force SacctCli.db to use this isolated temporary database
+    allow(SacctCli).to receive(:db).and_return(test_db)
+
+    # 4. Bypass TTY table & metrics formatting to avoid terminal ioctl errors
+    allow_any_instance_of(SacctCli).to receive(:tty_table)
+      .and_return([%w[JobID User State], [['1001', 'alice', 'COMPLETED']]])
+    allow_any_instance_of(SacctCli).to receive(:metrics)
+  end # <-- Fixed: missing end for the before block was added here
+
+  describe '#call' do 
+    context 'when default options are passed' do
+      it 'runs the real SacctCli parse, database queries, and table rendering using testing.json' do
+        expect { command.call }.to output(/=== INDIVIDUAL JOBS TABLE ===/).to_stdout
+      end
+    end
+  end
+end

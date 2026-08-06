@@ -9,9 +9,7 @@ class SacctParser
     @db = SacctCli.db
   end
 
-  def parse
-    file = File.read('jobs_last_7days.json')
-    data = JSON.parse(file)
+  def parse(data)
     data['jobs']&.each do |job|
       formatted = get_formatted(job)
       payload = get_payload(job, formatted)

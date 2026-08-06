@@ -22,7 +22,9 @@ class SacctCli
   end
 
   def parse
-    @parse.parse
+    file = File.read('jobs_last_7days.json')
+    data = JSON.parse(file)
+    @parse.parse(data)
   end
 
   def format_state(state)

@@ -136,4 +136,6 @@ module Commands
   register 'report', Report
 end
 
-Dry::CLI.new(Commands).call
+if $PROGRAM_NAME == __FILE__
+  Dry::CLI.new(Commands).call
+end
