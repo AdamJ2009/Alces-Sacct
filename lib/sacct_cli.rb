@@ -19,13 +19,13 @@ class SacctCli
   def fetch_and_store(sacct_args = [])
     extra_flags = Array(sacct_args).join(' ')
     
-    cmd = "sacct #{extra_flags} > jobs.json"
+    cmd = "sacct #{extra_flags} --json > jobs.json"
     puts "Executing: #{cmd}"
     `#{cmd}`
   end
 
   def parse
-    file = File.read('jobs.json')
+    file = File.read('testing.json')
     data = JSON.parse(file)
     @parse.parse(data)
   end

@@ -10,11 +10,10 @@ class SacctParser
   end
 
   def parse(data)
-    data['jobs']&.each do |job|
+    data['jobs']&.map do |job|
       formatted = get_formatted(job)
       payload = get_payload(job, formatted)
-      payload
-    end
+    end || []
   end
 
   private
@@ -78,7 +77,7 @@ class SacctParser
 
   def timing_payload(job, formatted, sub_time, start_time)
     {
-      job_id: job['jobID'], user: job['user'], partition: job['partition'],
+      job_id: job['job_id'], user: job['user'], partition: job['partition'],
       state: job.dig('state', 'current'), submit: sub_time, start: start_time,
       end: job.dig('time', 'end').to_i, elapsed: formatted[4],
       queuetime: calculate_queuetime(sub_time, start_time).round(4)

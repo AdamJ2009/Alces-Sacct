@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "command": ["sacct", "-a", "--json"]
+  },
+  "jobs": [
+    {
+      "job_id": 100001,
+      "user": "alice",
+      "partition": "nodes",
+      "state": { "current": "COMPLETED" },
+      "exit_code": { "return_code": 0 },
+      "required": {
+        "CPUs": 8,
+        "memory_per_cpu": { "number": 2048 }
+      },
+      "time": {
+        "submission": 1735689600,
+        "start": 1735689610,
+        "end": 1735693210,
+        "elapsed": 3600,
+        "total": { "seconds": 28800, "microseconds": 0 }
+      },
+      "steps": [
+        {
+          "tres": {
+            "requested": {
+              "max": [
+                { "type": "mem", "count": 12582912 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "job_id": 100002,
+      "user": "bob",
+      "partition": "gpu",
+      "state": { "current": "FAILED" },
+      "exit_code": { "return_code": 1 },
+      "required": {
+        "CPUs": 4,
+        "memory_per_cpu": { "number": 4096 }
+      },
+      "time": {
+        "submission": 1738368000,
+        "start": 1738368060,
+        "end": 1738368120,
+        "elapsed": 60,
+        "total": { "seconds": 30, "microseconds": 500000 }
+      },
+      "steps": [
+        {
+          "tres": {
+            "requested": {
+              "max": [
+                { "type": "mem", "count": 2097152 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "job_id": 100003,
+      "user": "alice",
+      "partition": "highmem",
+      "state": { "current": "RUNNING" },
+      "exit_code": { "return_code": 0 },
+      "required": {
+        "CPUs": 32,
+        "memory_per_cpu": { "number": 8192 }
+      },
+      "time": {
+        "submission": 1740787200,
+        "start": 1740787220,
+        "end": 0,
+        "elapsed": 1200,
+        "total": { "seconds": 15000, "microseconds": 0 }
+      },
+      "steps": [
+        {
+          "tres": {
+            "requested": {
+              "max": [
+                { "type": "mem", "count": 52428800 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "job_id": 100004,
+      "user": "charlie",
+      "partition": "nodes",
+      "state": { "current": "CANCELLED" },
+      "exit_code": { "return_code": 0 },
+      "required": {
+        "CPUs": 1,
+        "memory_per_cpu": { "number": 1024 }
+      },
+      "time": {
+        "submission": 1740873600,
+        "start": 1740873600,
+        "end": 1740873610,
+        "elapsed": 10,
+        "total": { "seconds": 0, "microseconds": 0 }
+      },
+      "steps": []
+    }
+  ]
+}
