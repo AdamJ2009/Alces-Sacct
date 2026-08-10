@@ -26,13 +26,26 @@ module Commands
 
     option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
+    option :json,      aliases: ['-j'], type: :boolean, desc: 'Custom Json File, default jobs.json'
 
     argument :sacct_args, type: :array, required: false, desc: 'Direct flags to pass to sacct'
 
-    def call(sacct_args: [], **opts)
+    def call(sacct_args: [], json: 'jobs.json', **opts)
       cli = SacctCli.new
-      cli.fetch_and_store(sacct_args)
-      results = cli.parse
+      json = json_check!(json)
+      cli.fetch_and_store(json, sacct_args)
+      results = cli.parse(json)
+      if results.any?
+        put_results(cli, results, **opts)
+      else
+        puts 'No records found matching criteria.'
+      end
+    end
+
+    def read_json_only(json, **opts)
+      cli = SacctCli.new
+      json = json_check!(json)
+      results = cli.parse(json)
       if results.any?
         put_results(cli, results, **opts)
       else
@@ -41,6 +54,14 @@ module Commands
     end
 
     private
+
+    def json_check!(filename)
+      unless filename =~ /\.json$/i
+        puts "Error: Invalid json filename '#{filename}'. Must end with .json"
+        exit 1
+      end
+      filename
+    end
 
     def get_time(start, end_date)
       start_safe = start ? parse_date!('start', start) : EPOCH_START
@@ -109,7 +130,22 @@ module Commands
     end
   end
 
+  # Only reads an existing json
+  class Read < Dry::CLI::Command
+    desc 'Read existing json sacct output'
+
+    argument :json, required: true, desc: 'Path to JSON file'
+
+    option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
+    option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
+
+    def call(json:, **opts)
+      Report.new.read_json_only(json, **opts)
+    end
+  end
+
   register 'report', Report
+  register 'read_json', Read
 end
 
 Dry::CLI.new(Commands).call if $PROGRAM_NAME == __FILE__

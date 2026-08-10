@@ -15,16 +15,17 @@ class SacctCli
     @metrics = SacctMetrics.new
   end
 
-  def fetch_and_store(sacct_args = [])
+  def fetch_and_store(json, sacct_args = [])
     extra_flags = Array(sacct_args).join(' ')
 
-    cmd = "sacct #{extra_flags} --json > jobs.json"
+    cmd = "sacct #{extra_flags} --json > #{json}"
     puts "Executing: #{cmd}"
     `#{cmd}`
   end
 
-  def parse
-    file = File.read('jobs.json')
+  def parse(json)
+    puts json
+    file = File.read(json)
     data = JSON.parse(file)
     @parse.parse(data)
   end
