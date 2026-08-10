@@ -26,7 +26,7 @@ module Commands
 
     option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
-    option :json,      aliases: ['-j'], type: :boolean, desc: 'Custom Json File, default jobs.json'
+    option :json,      aliases: ['-j'], type: :string, desc: 'Custom Json File, default jobs.json'
 
     argument :sacct_args, type: :array, required: false, desc: 'Direct flags to pass to sacct'
 
@@ -134,7 +134,7 @@ module Commands
   class Read < Dry::CLI::Command
     desc 'Read existing json sacct output'
 
-    argument :json, required: true, desc: 'Path to JSON file'
+    argument :json, required: false, desc: 'Path to JSON file'
 
     option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
