@@ -5,9 +5,6 @@ require_relative 'sacct_cli'
 
 # To get the special metrics from cli
 class SacctParser
-  def initialize
-    @db = SacctCli.db
-  end
 
   def parse(data)
     data['jobs']&.map do |job|

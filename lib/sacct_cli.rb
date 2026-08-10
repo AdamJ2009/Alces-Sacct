@@ -11,7 +11,6 @@ class SacctCli
   attr_reader :db
 
   def initialize
-    @db = SacctCli.db
     @parse = SacctParser.new
     @metrics = SacctMetrics.new
   end
@@ -25,7 +24,7 @@ class SacctCli
   end
 
   def parse
-    file = File.read('testing.json')
+    file = File.read('jobs.json')
     data = JSON.parse(file)
     @parse.parse(data)
   end
