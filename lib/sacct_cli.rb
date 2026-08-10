@@ -22,15 +22,12 @@ class SacctCli
     `#{cmd}`
   end
 
-  def parse(no_save,json)
-    puts json
+  def parse(no_save, json)
     file = File.read(json)
     data = JSON.parse(file)
     value = @parse.parse(data)
-    if no_save
-      delete_json(json)
-    end
-    return value
+    delete_json(json) if no_save
+    value
   end
 
   def format_state(state)
@@ -128,7 +125,7 @@ class SacctCli
   end
 
   def delete_json(json)
-    cmd = "rm " + json
+    cmd = "rm #{json}"
     `#{cmd}`
   end
 end

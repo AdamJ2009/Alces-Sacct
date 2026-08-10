@@ -27,7 +27,8 @@ module Commands
     option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
     option :json,      aliases: ['-j'], type: :string, desc: 'Custom Json File, default jobs.json'
-    option :no_save,   aliases: ['-n', '--no', '--delete', '-d'], type: :boolean, desc: "Elimates json file after running"
+    option :no_save,   aliases: ['-n', '--no', '--delete', '-d'], type: :boolean,
+                       desc: 'Elimates json file after running'
 
     argument :sacct_args, type: :array, required: false, desc: 'Direct flags to pass to sacct'
 
@@ -35,19 +36,18 @@ module Commands
       cli = SacctCli.new
       json = json_check!(json)
       cli.fetch_and_store(json, sacct_args)
-      results = cli.parse(no_save,json)
+      results = cli.parse(no_save, json)
       if results.any?
         put_results(cli, results, **opts)
       else
         puts 'No records found matching criteria.'
       end
-
     end
 
     def read_json_only(json, **opts)
       cli = SacctCli.new
       json = json_check!(json)
-      results = cli.parse(false,json)
+      results = cli.parse(false, json)
       if results.any?
         put_results(cli, results, **opts)
       else
@@ -115,9 +115,6 @@ module Commands
     desc 'Read existing CSV output'
 
     argument :csv, required: true, desc: 'Path to csv file'
-
-    option :csv_out,   aliases: ['-c'], type: :string, desc: 'Output CSV filename'
-    option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
 
     def call(csv:, **opts)
       cli = SacctCli.new
