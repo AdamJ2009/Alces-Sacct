@@ -13,8 +13,4 @@ class SacctCli
       yaml[:default].merge(yaml[env] || {})
     end
   end
-
-  def self.db
-    @db ||= Sequel.sqlite(settings[:db_path])
-  end
 end

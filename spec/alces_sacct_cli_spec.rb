@@ -22,32 +22,6 @@ RSpec.describe Commands::Report do
       File.read(File.expand_path('fixtures/testing.json', __dir__))
     )
 
-    # 3. USE AN IN-MEMORY DATABASE FOR TESTS
-    test_db = Sequel.sqlite # Creates a brand new in-memory SQLite DB in RAM
-    
-    # Run schema setup on test_db
-    test_db.create_table?(:sacct) do
-      Integer :job_id, primary_key: true, null: false
-      String :user
-      String :partition
-      String :state
-      Integer :submit
-      Integer :start
-      Integer :end
-      Integer :elapsed
-      Float :queuetime
-      Integer :alloccpus
-      Float :totalcpus
-      Float :cpueff
-      Float :reqmem
-      Float :maxrss
-      Float :memeff
-      Integer :exitcode
-    end
-
-    # Force SacctCli.db to use this isolated temporary database
-    allow(SacctCli).to receive(:db).and_return(test_db)
-
     # 4. Bypass TTY table & metrics formatting to avoid terminal ioctl errors
     allow_any_instance_of(SacctCli).to receive(:tty_table)
       .and_return([%w[JobID User State], [['1001', 'alice', 'COMPLETED']]])

@@ -5,16 +5,12 @@ require_relative 'sacct_cli'
 
 # To get the special metrics from cli
 class SacctParser
-  def initialize
-    @db = SacctCli.db
-  end
 
   def parse(data)
-    data['jobs']&.each do |job|
+    data['jobs']&.map do |job|
       formatted = get_formatted(job)
       payload = get_payload(job, formatted)
-      load_to_database(payload)
-    end
+    end || []
   end
 
   private

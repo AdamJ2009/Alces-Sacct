@@ -11,18 +11,20 @@ class SacctCli
   attr_reader :db
 
   def initialize
-    @db = SacctCli.db
     @parse = SacctParser.new
     @metrics = SacctMetrics.new
   end
 
-  def fetch_and_store
-    cmd = 'sacct -a -S now-7days --json > jobs_last_7days.json'
+  def fetch_and_store(sacct_args = [])
+    extra_flags = Array(sacct_args).join(' ')
+    
+    cmd = "sacct #{extra_flags} --json > jobs.json"
+    puts "Executing: #{cmd}"
     `#{cmd}`
   end
 
   def parse
-    file = File.read('jobs_last_7days.json')
+    file = File.read('jobs.json')
     data = JSON.parse(file)
     @parse.parse(data)
   end
