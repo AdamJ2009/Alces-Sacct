@@ -17,7 +17,7 @@ class SacctCli
 
   def fetch_and_store(sacct_args = [])
     extra_flags = Array(sacct_args).join(' ')
-    
+
     cmd = "sacct #{extra_flags} --json > jobs.json"
     puts "Executing: #{cmd}"
     `#{cmd}`
@@ -59,10 +59,8 @@ class SacctCli
   end
 
   def render_section
-    headers = [
-      'Group', 'Count', 'Mean CPU', 'Mean Mem', 'Median CPU',
-      'Median Mem', 'Queue Median', '95% Queue', 'Outcomes %', 'Exit Summary'
-    ]
+    headers = ['Group', 'Count', 'Mean CPU', 'Mean Mem', 'Median CPU',
+               'Median Mem', 'Queue Median', '95% Queue', 'Outcomes %', 'Exit Summary']
     lambda do |title, grouped_hash|
       puts "\n=== #{title} ==="
       rows = @metrics.build_rows(grouped_hash)
@@ -83,20 +81,16 @@ class SacctCli
   end
 
   def verbose_timing_fields(val)
-    [
-      format_timestamp(val[:submit]),
-      format_timestamp(val[:start]),
-      format_end_time(val[:end]),
-      "#{val[:elapsed]}s",
-      "#{val[:queuetime]}s"
-    ]
+    [format_timestamp(val[:submit]),
+     format_timestamp(val[:start]),
+     format_end_time(val[:end]),
+     "#{val[:elapsed]}s",
+     "#{val[:queuetime]}s"]
   end
 
   def verbose_metrics_fields(val)
-    [
-      val[:alloccpus], "#{val[:totalcpus]}s", "#{val[:cpueff]}%",
-      "#{val[:reqmem]}MB", "#{val[:maxrss] / 1024.0}MB", "#{val[:memeff]}%", val[:exitcode]
-    ]
+    [val[:alloccpus], "#{val[:totalcpus]}s", "#{val[:cpueff]}%",
+     "#{val[:reqmem]}MB", "#{val[:maxrss] / 1024.0}MB", "#{val[:memeff]}%", val[:exitcode]]
   end
 
   def format_timestamp(time_s)
@@ -124,10 +118,8 @@ class SacctCli
 
   def clean_table(results)
     results.map do |v|
-      [
-        v[:job_id], v[:user], v[:partition], v[:state], "#{v[:queuetime]}s",
-        "#{v[:totalcpus]}s", "#{v[:cpueff]}%", "#{v[:memeff]}%", v[:exitcode]
-      ]
+      [v[:job_id], v[:user], v[:partition], v[:state], "#{v[:queuetime]}s",
+       "#{v[:totalcpus]}s", "#{v[:cpueff]}%", "#{v[:memeff]}%", v[:exitcode]]
     end
   end
 end

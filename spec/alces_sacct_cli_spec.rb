@@ -24,11 +24,11 @@ RSpec.describe Commands::Report do
 
     # 4. Bypass TTY table & metrics formatting to avoid terminal ioctl errors
     allow_any_instance_of(SacctCli).to receive(:tty_table)
-      .and_return([%w[JobID User State], [['1001', 'alice', 'COMPLETED']]])
+      .and_return([%w[JobID User State], [%w[1001 alice COMPLETED]]])
     allow_any_instance_of(SacctCli).to receive(:metrics)
-  end # <-- Fixed: missing end for the before block was added here
+  end
 
-  describe '#call' do 
+  describe '#call' do
     context 'when default options are passed' do
       it 'runs the real SacctCli parse, database queries, and table rendering using testing.json' do
         expect { command.call }.to output(/=== INDIVIDUAL JOBS TABLE ===/).to_stdout

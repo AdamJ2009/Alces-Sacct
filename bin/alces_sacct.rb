@@ -26,10 +26,10 @@ module Commands
 
     option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
-    
+
     argument :sacct_args, type: :array, required: false, desc: 'Direct flags to pass to sacct'
 
-    def call(sacct_args: [],**opts)
+    def call(sacct_args: [], **opts)
       cli = SacctCli.new
       cli.fetch_and_store(sacct_args)
       results = cli.parse
@@ -112,6 +112,4 @@ module Commands
   register 'report', Report
 end
 
-if $PROGRAM_NAME == __FILE__
-  Dry::CLI.new(Commands).call
-end
+Dry::CLI.new(Commands).call if $PROGRAM_NAME == __FILE__
