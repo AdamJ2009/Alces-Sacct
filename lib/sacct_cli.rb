@@ -19,15 +19,18 @@ class SacctCli
     extra_flags = Array(sacct_args).join(' ')
 
     cmd = "sacct #{extra_flags} --json > #{json}"
-    puts "Executing: #{cmd}"
     `#{cmd}`
   end
 
-  def parse(json)
+  def parse(no_save,json)
     puts json
     file = File.read(json)
     data = JSON.parse(file)
-    @parse.parse(data)
+    value = @parse.parse(data)
+    if no_save
+      delete_json(json)
+    end
+    return value
   end
 
   def format_state(state)
@@ -122,5 +125,10 @@ class SacctCli
       [v[:job_id], v[:user], v[:partition], v[:state], "#{v[:queuetime]}s",
        "#{v[:totalcpus]}s", "#{v[:cpueff]}%", "#{v[:memeff]}%", v[:exitcode]]
     end
+  end
+
+  def delete_json(json)
+    cmd = "rm " + json
+    `#{cmd}`
   end
 end

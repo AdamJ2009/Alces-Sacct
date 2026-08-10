@@ -1,0 +1,2 @@
+job_id,user,partition,state,queuetime,cputime,cpueff,memeff,exitcode
+104276,alces-cluster,nodes,COMPLETED,1.0s,0.0053s,0.0018%,0.0221%,0
