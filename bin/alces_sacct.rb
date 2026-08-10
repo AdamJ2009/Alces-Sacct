@@ -139,7 +139,7 @@ module Commands
     option :csv,       aliases: ['-c'], type: :string, desc: 'Output CSV filename'
     option :verbose,   aliases: ['-v'], type: :boolean, desc: 'Give all values'
 
-    def call(json:, **opts)
+    def call(json: 'jobs.json', **opts)
       Report.new.read_json_only(json, **opts)
     end
   end
