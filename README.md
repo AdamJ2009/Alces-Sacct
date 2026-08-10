@@ -2,7 +2,7 @@ Alces-Sacct
 
 Run
 ```
-bin/alces-sacct.rb report
+bin/alces_sacct.rb report
 ```
 
 
